@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reviews', function (Blueprint $table) {
+        Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->longText('komentar');
-            $table->decimal('rating', 2, 1);
-            $table->enum('validasi', ['belum', 'sudah'])->default('belum');
-            $table->enum('perubahan', ['tidak', 'ya'])->default('tidak');
-            $table->foreignId('user_id');
+            $table->string('name');
+            $table->string('logo');
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reviews');
+        Schema::dropIfExists('companies');
     }
 };

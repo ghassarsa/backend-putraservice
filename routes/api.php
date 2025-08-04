@@ -19,6 +19,6 @@ Route::prefix('v1')->group(function () {
         Route::post('/validasi/review/{id}', [ReviewController::class, 'validasi']);
         Route::post('edit/review/{id}', [ReviewController::class, 'edit']);
         Route::post('delete/review/{id}', [ReviewController::class, 'delete']);
-        Route::post('/categories/{category}', [CategoryController::class, 'show']);
+        Route::post('/categories/{name}', [CategoryController::class, 'show']);
     });
 });

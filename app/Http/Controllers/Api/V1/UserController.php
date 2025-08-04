@@ -20,7 +20,7 @@ class UserController extends Controller
         ]);
 
         if ($validasi->fails()) {
-            return response()->json(['message' => 'Email sudah di ambil'], 402);
+            return response()->json(['errors' => $validasi->errors()], 422);
         }
 
         User::create([

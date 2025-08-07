@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\DocsController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,8 @@ Route::prefix('v1')->group(function () {
             Route::post('/logout', [UserController::class, 'logout']);        
         });
     });
+
+    Route::get('docs', [DocsController::class, 'index']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create/review', [ReviewController::class, 'store']);

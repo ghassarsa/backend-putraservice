@@ -20,14 +20,16 @@ public function store(Request $request)
         ]);
 
         if ($validasi->fails()) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $validasi->errors()
+            ], 422);
         }
     
         $review = Review::create([
-            'name' => Auth::user()->name,
-            'email' => Auth::user()->email,
             'komentar' => $request->komentar,
             'rating' => $request->rating,
+            'user_id' => auth()->id(),
         ]);
     
         return response()->json([
@@ -54,7 +56,7 @@ public function store(Request $request)
 
     public function edit(Request $request, $id) {
         $review = Review::findOrFail($id);
-        if ($review !== Auth::id()) {
+        if ($review->user_id !== auth()->id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -64,13 +66,17 @@ public function store(Request $request)
             'rating' => $request->rating,
         ]);
 
-        return response()->json(['message' => 'Review berhasil diperbarui', 201]);
+        return response()->json(['message' => 'Review berhasil diperbarui'], 200);
     }
 
     public function delete($id) {
         $review = review::findOrFail($id);
 
+        if ($review->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         $review->delete();
-        return response()->json(['message' => 'The user review is deleted successfuly']);
+        return response()->json(['message' => 'The user review is deleted successfuly'], 200);
     }
 }

@@ -10,12 +10,18 @@ Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/register', [UserController::class, 'register']);
         Route::post('/login', [UserController::class, 'login']);
+        Route::get('/google', [UserController::class, 'redirectToGoogle'])->name('google.login');
+        Route::get('/google/callback', [UserController::class, 'handleGoogleCallback']);
         Route::middleware('auth:sanctum')->group(function () {
+            Route::get('/me', [UserController::class, 'me']);
+            Route::put('/update-profile', [UserController::class, 'updateProfile']);
+            Route::put('/user/password', [UserController::class, 'updatePassword']);
             Route::post('/logout', [UserController::class, 'logout']);        
         });
     });
 
     Route::get('docs', [DocsController::class, 'index']);
+    Route::get('/show/review', [ReviewController::class, 'show']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create/review', [ReviewController::class, 'store']);

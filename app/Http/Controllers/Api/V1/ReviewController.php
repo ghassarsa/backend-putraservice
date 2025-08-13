@@ -12,7 +12,27 @@ use Illuminate\Support\Str;
 
 class ReviewController extends Controller
 {
-public function store(Request $request)
+    public function show() {
+    $reviews = Review::with('user')
+        ->where('validasi', 'sudah')
+        ->orderBy('updated_at', 'desc')
+        ->get();
+
+    // Ubah format data yang dikirim ke frontend supaya mudah dipakai
+    $data = $reviews->map(function($review) {
+        return [
+            'id' => $review->id,
+            'komentar' => $review->komentar,
+            'rating' => $review->rating,
+            'updated_at' => $review->updated_at->diffForHumans(),
+            'name' => $review->user->name ?? 'User',
+        ];
+    });
+
+    return response()->json($data);
+    }
+
+    public function store(Request $request)
     {
         $validasi = Validator::make($request->all(), [
             'komentar' => 'required|string',

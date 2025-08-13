@@ -16,4 +16,8 @@ class review extends Model
         'device_token',
         'perubahan',
     ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }

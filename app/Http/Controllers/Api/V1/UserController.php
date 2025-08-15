@@ -13,17 +13,25 @@ use Laravel\Socialite\Facades\Socialite;
 
 class UserController extends Controller
 {
-    public function me() {
-    $user = Auth::user();
-    if ($user->avatar) {
-        $user->avatar = asset('storage/' . $user->avatar);
-    }
-    return response()->json($user);
+    public function me()
+    {
+        $user = Auth::user();
+
+        if ($user->google_id) {
+            $user->avatar = $user->avatar;
+        } else {
+            $user->avatar = $user->avatar
+                ? asset('storage/' . $user->avatar)
+                : null;
+        }
+
+        return response()->json($user);
     }
 
-    public function updateProfile(Request $request) {
+    public function updateProfile(Request $request)
+    {
         $user = Auth::user();
-        
+
         $validator = Validator::make($request->all(), [
             'name'   => 'required|string|max:255',
             'email'  => 'required|email|unique:users,email,' . $user->id,
@@ -49,18 +57,19 @@ class UserController extends Controller
             $avatarName = time() . '_' . $avatar->getClientOriginalName();
             $avatarPath = $avatar->storeAs('uploads/profile', $avatarName, 'public');
             $user->avatar = $avatarPath;
-    }
+        }
 
         $user->save();
 
         return response()->json([
             'success' => true,
             'message' => 'Profil berhasil diperbarui',
-        'user'    => $user
-    ]);
+            'user'    => $user
+        ]);
     }
 
-    public function updatePassword(Request $request) {
+    public function updatePassword(Request $request)
+    {
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
@@ -87,7 +96,8 @@ class UserController extends Controller
         ]);
     }
 
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
         $validasi = Validator::make($request->all(), [
             'name' => 'required|string',
             'email' => 'required|string|email|unique:users,email',
@@ -100,9 +110,9 @@ class UserController extends Controller
         }
 
         $avatarPath = null;
-          if ($request->hasFile('avatar')) {
+        if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar');
-            $avatarName = time().'_'.$avatar->getClientOriginalName();
+            $avatarName = time() . '_' . $avatar->getClientOriginalName();
             $avatarPath = $avatar->storeAs('uploads/profile', $avatarName, 'public');
         }
 
@@ -118,7 +128,8 @@ class UserController extends Controller
         return response()->json(['message' => 'User Created Successfuly'], 201);
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         $credentials = $request->only('email', 'password');
 
         if (!Auth::attempt($credentials)) {
@@ -126,24 +137,27 @@ class UserController extends Controller
         }
         $user = Auth::user();
         $token = $user->createToken('api-token')->plainTextToken;
-        
+
         return response()->json(['message' => 'Anda berhasil login', 'user' => $user, 'token' => $token], 200);
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Berhasil logout']);
     }
 
-    public function redirectToGoogle() {
+    public function redirectToGoogle()
+    {
         return Socialite::driver('google')
             ->stateless()
             ->with(['prompt' => 'select_account'])
             ->redirect();
     }
 
-    public function handleGoogleCallback() {
+    public function handleGoogleCallback()
+    {
         $googleUser = Socialite::driver('google')->stateless()->user();
 
         $user = User::where('email', $googleUser->getEmail())->first();
@@ -165,7 +179,7 @@ class UserController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         $frontendUrl = 'http://localhost:5173/?token=' . $token;
-        
+
         return redirect($frontendUrl);
     }
 }

@@ -23,5 +23,13 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'is_admin' => true,
         ]);
+
+        User::factory()->create([
+            'avatar' => 'asuidasdoh',
+            'name' => 'User1',
+            'email' => 'User1@example.com',
+            'password' => Hash::make('password'),
+            'is_admin' => false,
+        ]);
     }
 }

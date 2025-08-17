@@ -26,8 +26,9 @@ class CategoryResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')
-                ->label('Name')
-                ->required()
+                    ->label('Name')
+                    ->dehydrateStateUsing(fn($state) => str_replace(' ', '-', strtolower($state)))
+                    ->required()
             ]);
     }
 
@@ -35,7 +36,9 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->label('Name')
+                TextColumn::make('name')
+                    ->label('Name')
+                    ->formatStateUsing(fn($state) => str_replace('-', ' ', $state)),
             ])
             ->filters([
                 //

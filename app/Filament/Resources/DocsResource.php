@@ -15,6 +15,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Models\Category;
+use Filament\Forms\Components\Select;
 
 class DocsResource extends Resource
 {
@@ -37,7 +39,11 @@ class DocsResource extends Resource
                     ->required(),
                 TextInput::make('description')
                     ->label('Description')
-                    ->nullable()
+                    ->nullable(),
+                Select::make('category_id')
+                    ->label('Category')
+                    ->relationship('category', 'name')
+                    ->required()
             ]);
     }
 
@@ -48,6 +54,7 @@ class DocsResource extends Resource
                 TextColumn::make('title')->label('Title'),
                 TextColumn::make('image')->label('Image'),
                 TextColumn::make('description')->label('Description'),
+                TextColumn::make('category_id')->label('category'),
             ])
             ->filters([
                 //

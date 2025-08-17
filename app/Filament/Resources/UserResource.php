@@ -7,6 +7,7 @@ use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -23,12 +24,18 @@ class UserResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return 'Admin';
+        return 'Kelola Pengguna';
     }
 
     public static function getModelLabel(): string
     {
         return 'Admin';
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        // Hanya ambil user yang is_admin = true
+        return parent::getEloquentQuery()->where('is_admin', true);
     }
 
     public static function form(Form $form): Form
@@ -61,7 +68,6 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name')->label('Name'),
                 TextColumn::make('email')->label('Email'),
-                TextColumn::make('is_admin')->label('Is Admin'),
             ])
             ->filters([
                 //

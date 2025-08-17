@@ -10,9 +10,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Auth\Events\Registered;
 
 class UserController extends Controller
 {
+    // Mendapatkan data user
     public function me()
     {
         $user = Auth::user();
@@ -95,7 +97,9 @@ class UserController extends Controller
             'message' => 'Password berhasil diperbarui',
         ]);
     }
+    // Akhir dari menampilkan data user
 
+    // Register, Login, and Logout Methods
     public function register(Request $request)
     {
         $validasi = Validator::make($request->all(), [
@@ -116,16 +120,24 @@ class UserController extends Controller
             $avatarPath = $avatar->storeAs('uploads/profile', $avatarName, 'public');
         }
 
-        User::create([
+        $user = User::create([
             'avatar' => $avatarPath,
             'name' => $request->name,
             'email' => $request->email,
-            'email_verified_at' => now(),
             'password' => Hash::make($request->password),
             'remember_token' => Str::random(10),
         ]);
 
-        return response()->json(['message' => 'User Created Successfuly'], 201);
+        // Kirim email verifikasi
+        event(new Registered($user));
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'User created. Please verify your email.',
+            'token' => $token,
+            'user' => $user,
+        ], 201);
     }
 
     public function login(Request $request)
@@ -147,7 +159,10 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Berhasil logout']);
     }
+    // End Register, Login, and Logout Methods
 
+
+    // Google Login Methods
     public function redirectToGoogle()
     {
         return Socialite::driver('google')
@@ -170,6 +185,7 @@ class UserController extends Controller
                 'name' => $googleUser->getName(),
                 'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getId(),
+                'email_verified_at' => now(),
                 'password' => bcrypt(uniqid())
             ]);
             $statusCode = 201;
@@ -178,8 +194,9 @@ class UserController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        $frontendUrl = 'http://localhost:5173/?token=' . $token;
+        $frontendUrl = env('FRONTEND_URL') . '/?token=' . $token;
 
         return redirect($frontendUrl);
     }
+    // End Google Login Methods
 }

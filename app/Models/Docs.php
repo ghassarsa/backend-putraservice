@@ -10,5 +10,11 @@ class Docs extends Model
         'title',
         'image',
         'description',
+        'category_id',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

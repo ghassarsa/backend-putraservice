@@ -55,4 +55,5 @@ Route::prefix('v1')->group(function () {
             Route::post('/categories/{name}', 'show');
         });
     });
+    Route::get('/categories', [CategoryController::class, 'index']);
 });

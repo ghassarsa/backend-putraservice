@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Auth\Events\Registered;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Encoders\WebpEncoder;
 
 class UserController extends Controller
 {
@@ -99,14 +102,13 @@ class UserController extends Controller
     }
     // Akhir dari menampilkan data user
 
-    // Register, Login, and Logout Methods
     public function register(Request $request)
     {
         $validasi = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'email' => 'required|string|email|unique:users,email',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|unique:users,email',
             'password' => 'required|string|min:8',
-            'avatar' => 'nullable|image|max:2048',
+            'avatar'   => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($validasi->fails()) {
@@ -114,26 +116,42 @@ class UserController extends Controller
         }
 
         $avatarPath = null;
+
         if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar');
-            $avatarName = time() . '_' . $avatar->getClientOriginalName();
-            $avatarPath = $avatar->storeAs('uploads/profile', $avatarName, 'public');
+            $avatarName = time() . '.webp';
+
+            $manager = new ImageManager(new Driver());
+
+            $image = $manager->read($avatar->getRealPath());
+
+            $savePath = storage_path('app/public/uploads/profile/' . $avatarName);
+            if (!file_exists(dirname($savePath))) {
+                mkdir(dirname($savePath), 0777, true);
+            }
+
+            $image->scaleDown(width: 500)
+                ->encode(new WebpEncoder(quality: 70))
+                ->save($savePath);
+
+            $avatarPath = 'uploads/profile/' . $avatarName;
         }
 
+        // Simpan user baru
         $user = User::create([
-            'avatar' => $avatarPath,
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'avatar'         => $avatarPath,
+            'name'           => $request->name,
+            'email'          => $request->email,
+            'password'       => Hash::make($request->password),
             'remember_token' => Str::random(10),
         ]);
 
-        // Kirim email verifikasi
         event(new Registered($user));
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
+            'success' => true,
             'message' => 'User created. Please verify your email.',
             'token' => $token,
             'user' => $user,

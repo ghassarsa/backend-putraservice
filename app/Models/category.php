@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class category extends Model
+class Category extends Model
 {
-    protected $fillable = [
-        'name',
-    ];
+    protected $fillable = ['name'];
+
+    public function docs()
+    {
+        return $this->hasMany(Docs::class); // pastikan Docs::class sesuai namespace
+    }
 }

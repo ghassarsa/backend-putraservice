@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('docs', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->nullable();
+            $table->string('title');
             $table->string('image');
             $table->longText('description')->nullable();
             $table->foreignId('category_id');

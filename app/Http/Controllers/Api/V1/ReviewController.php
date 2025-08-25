@@ -26,6 +26,13 @@ class ReviewController extends Controller
             'rating' => $review->rating,
             'updated_at' => $review->updated_at->diffForHumans(),
             'name' => $review->user->name ?? 'User',
+            'avatar' => $review->user
+                ? (
+                    $review->user->google_id
+                    ? $review->user->avatar 
+                    : ($review->user->avatar ? asset('storage/' . $review->user->avatar) : null)
+                  )
+                : null,
         ];
     });
 
@@ -45,13 +52,13 @@ class ReviewController extends Controller
                 'errors' => $validasi->errors()
             ], 422);
         }
-    
+
         $review = Review::create([
             'komentar' => $request->komentar,
             'rating' => $request->rating,
             'user_id' => auth()->id(),
         ]);
-    
+
         return response()->json([
             'message' => 'Review berhasil dibuat',
             'data' => $review
@@ -62,7 +69,7 @@ class ReviewController extends Controller
         $validasi = review::findOrFail($id);
 
         $validasi->update([
-            'validasi' => 'sudah', 
+            'validasi' => 'sudah',
         ]);
 
         if (!$validasi) {

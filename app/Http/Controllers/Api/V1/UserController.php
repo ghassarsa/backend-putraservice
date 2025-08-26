@@ -40,7 +40,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name'   => 'required|string|max:255',
             'email'  => 'required|email|unique:users,email,' . $user->id,
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'avatar' => 'nullable|image|'
         ]);
 
         if ($validator->fails()) {
@@ -59,9 +59,23 @@ class UserController extends Controller
             }
 
             $avatar = $request->file('avatar');
-            $avatarName = time() . '_' . $avatar->getClientOriginalName();
-            $avatarPath = $avatar->storeAs('uploads/profile', $avatarName, 'public');
-            $user->avatar = $avatarPath;
+            $avatarName = time() . '.webp';
+
+            $manager = new ImageManager(new Driver());
+
+            $image = $manager->read($avatar->getRealPath());
+
+            $savePath = storage_path('app/public/uploads/profile/' . $avatarName);
+            if (!file_exists(dirname($savePath))) {
+                mkdir(dirname($savePath), 0777, true);
+            }
+
+            // resize + simpan ke webp
+            $image->scaleDown(width: 500)
+                ->encode(new WebpEncoder(quality: 70))
+                ->save($savePath);
+
+            $user->avatar = 'uploads/profile/' . $avatarName;
         }
 
         $user->save();

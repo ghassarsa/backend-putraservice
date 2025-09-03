@@ -6,11 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Docs extends Model
 {
-    protected $fillable = [
-        'title',
-        'image',
-        'description',
-        'category_id',
+    protected $fillable = ['category_id', 'image'];
+
+    protected $casts = [
+        'image' => 'string',
     ];
 
     public function category()

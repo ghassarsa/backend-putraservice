@@ -32,18 +32,15 @@ class DocsResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('title')
-                    ->label('Title')
-                    ->required(),
                 FileUpload::make('image')
                     ->label('Image')
                     ->disk('public')
                     ->directory('uploads/image')
-                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
                     ->imageResizeMode('cover')
                     ->imageCropAspectRatio('16:9')
                     ->imageResizeTargetWidth('1920')
                     ->imageResizeTargetHeight('1080')
+                    ->multiple()
                     ->getUploadedFileNameForStorageUsing(
                         fn(TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
                             ->prepend('image-')
@@ -53,7 +50,6 @@ class DocsResource extends Resource
                     )
                     ->storeFileNamesIn('original_filename')
                     ->saveUploadedFileUsing(function (TemporaryUploadedFile $file, $set) {
-                        // Generate filename
                         $filename = (string) str($file->getClientOriginalName())
                             ->prepend('image-')
                             ->replace(' ', '-')
@@ -64,7 +60,6 @@ class DocsResource extends Resource
                         $image = $manager->read($file->getRealPath());
 
                         $image->resize(1920, 1080);
-
                         $webpData = $image->encodeByExtension('webp', 80);
 
                         $path = 'uploads/image/' . $filename;
@@ -73,9 +68,6 @@ class DocsResource extends Resource
                         return $path;
                     })
                     ->required(),
-                TextInput::make('description')
-                    ->label('Description')
-                    ->nullable(),
                 Select::make('category_id')
                     ->label('Category')
                     ->relationship('category', 'name')

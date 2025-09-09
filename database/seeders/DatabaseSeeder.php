@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -17,19 +18,23 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'avatar' => 'asuidasdoh',
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => Hash::make('password'),
+            'avatar' => 'none',
+            'name' => 'putraservice',
+            'email' => 'pianseptiana@yahoo.com',
+            'password' => Hash::make('pian3073'),
             'is_admin' => true,
         ]);
 
-        User::factory()->create([
-            'avatar' => 'asuidasdoh',
-            'name' => 'User1',
-            'email' => 'User1@example.com',
-            'password' => Hash::make('password'),
-            'is_admin' => false,
+        Category::create([
+            'name' => 'service-ac'
+        ]);
+    
+        Category::create([
+            'name' => 'pembersihan-ac'
+        ]);
+    
+        Category::create([
+            'name' => 'bongkar-pasang-ac'
         ]);
     }
 }

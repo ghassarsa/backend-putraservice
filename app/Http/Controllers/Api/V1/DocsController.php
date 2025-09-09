@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Settings_docs;
+use App\Models\SettingsDocs;
 use App\Models\Docs;
 use Illuminate\Http\Request;
 
@@ -16,11 +16,11 @@ class DocsController extends Controller
 
         $setting = null;
         if ($categoryId) {
-            $setting = Settings_docs::where('category_id', $categoryId)->first();
+            $setting = SettingsDocs::where('category_id', $categoryId)->first();
         } else {
-            $setting = Settings_docs::whereNull('category_id')->first();
+            $setting = SettingsDocs::whereNull('category_id')->first();
         }
-        $limit = $setting ? intval($setting->value) : 30;
+        $limit = $setting ? intval($setting->value) : 15;
 
         $query = Docs::query();
         if ($categoryId) {

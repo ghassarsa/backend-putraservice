@@ -32,13 +32,11 @@ class DocsController extends Controller
         $docs = $query->orderBy('id', 'desc')
                       ->skip($offset)
                       ->take($limit)
-                      ->get(['id', 'title', 'description', 'image', 'category_id']);
+                      ->get(['id', 'image', 'category_id']);
 
         $data = $docs->map(function ($doc) {
             return [
                 'id' => $doc->id,
-                'title' => $doc->title,
-                'description' => $doc->description,
                 'image' => $doc->image,
                 'category_id' => $doc->category_id,
             ];

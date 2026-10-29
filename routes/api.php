@@ -14,8 +14,8 @@ use Illuminate\Http\Request;
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::controller(UserController::class)->group(function () {
-            Route::post('/register', 'register');
-            Route::post('/login', 'login');
+            Route::post('/register', 'register')->middleware('throttle:5,1');
+            Route::post('/login', 'login')->middleware('throttle:5,1');
             Route::get('/google', 'redirectToGoogle')->name('google.login');
             Route::get('/google/callback', 'handleGoogleCallback');
             Route::middleware('auth:sanctum')->group(function () {
@@ -32,8 +32,8 @@ Route::prefix('v1')->group(function () {
                 return redirect("{$frontendUrl}/comments?reset_token={$token}&email={$email}");
             })->name('password.reset');
 
-            Route::post('/forgot-password', 'sendResetLinkEmail');
-            Route::post('/reset-password', 'resetpassword');
+            Route::post('/forgot-password', 'sendResetLinkEmail')->middleware('throttle:3,1');
+            Route::post('/reset-password', 'resetpassword')->middleware('throttle:3,1');
             Route::middleware('auth:sanctum')->group(function () {
                 Route::get('/email/verify/check', 'checkVerification');
                 Route::post('/email/resend', 'resend');

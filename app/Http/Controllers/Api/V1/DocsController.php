@@ -20,7 +20,13 @@ class DocsController extends Controller
         } else {
             $setting = Settings_docs::whereNull('category_id')->first();
         }
+
+        // Batas maksimal limit dan offset untuk mencegah DoS via pagination
+        $maxLimit = 100;
+        $maxOffset = 10000;
         $limit = $setting ? intval($setting->value) : 30;
+        $limit = min($limit, $maxLimit);
+        $offset = min($offset, $maxOffset);
 
         $query = Docs::query();
         if ($categoryId) {

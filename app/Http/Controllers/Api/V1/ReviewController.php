@@ -66,6 +66,10 @@ class ReviewController extends Controller
     }
 
     public function validasi($id) {
+        if (! auth()->user()?->is_admin) {
+            return response()->json(['message' => 'Forbidden: admin only'], 403);
+        }
+
         $validasi = review::findOrFail($id);
 
         $validasi->update([
